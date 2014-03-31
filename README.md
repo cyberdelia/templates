@@ -15,7 +15,7 @@ $ go get github.com/cyberdelia/templates
 Generate the package:
 
 ```
-$ templates -source templates/ templates/templates.go
+$ templates -source templates/ > templates/templates.go
 ```
 
 Use it in your code:
