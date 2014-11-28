@@ -15,11 +15,17 @@ $ go get github.com/cyberdelia/templates
 Generate the package:
 
 ```
-$ templates -source templates/ > templates/templates.go
+$ templates -s templates/ > templates/templates.go
 ```
 
 Use it in your code:
 
 ```
 template = template.Must(templates.Parse(nil))
+```
+
+Or using ``go generate``:
+
+```
+//go:generate templates -s templates/ -o templates/templates.go
 ```
