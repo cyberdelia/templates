@@ -12,7 +12,10 @@ import (
 	"path/filepath"
 )
 
-var source = flag.String("source", path.Join(".", "templates"), "Location of templates")
+var (
+	source = flag.String("s", path.Join(".", "templates"), "Location of templates")
+	output = flag.String("o", "", "Output file")
+)
 
 func main() {
 	flag.Parse()
@@ -72,5 +75,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(string(clean))
+	file := os.Stdout
+	if *output != "" {
+		file, err = os.Create(*output)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	fmt.Fprintln(file, string(clean))
 }
