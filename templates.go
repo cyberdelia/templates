@@ -13,28 +13,37 @@ import (
 )
 
 var (
-	source = flag.String("s", path.Join(".", "templates"), "Location of templates")
-	output = flag.String("o", "", "Output file")
+	templateType = flag.String("t", "text", "Type of template (text/html)")
+	source       = flag.String("s", path.Join(".", "templates"), "Location of templates")
+	output       = flag.String("o", "", "Output file")
 )
 
 func main() {
 	flag.Parse()
 
 	buf := new(bytes.Buffer)
-	fmt.Fprint(buf, `package templates
+	fmt.Fprint(buf, fmt.Sprintf(`package templates
 
-	import "text/template"
+	import "%s/template"
 
-  	var templates = map[string]string{`)
+  	var templates = map[string]string{`, *templateType))
 
 	if err := filepath.Walk(*source, func(path string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		// Ignore non-templates files
-		if filepath.Ext(path) != ".tmpl" {
-			return nil
+		if *templateType == "text" {
+
+			// Ignore non-templates files
+			if filepath.Ext(path) != ".tmpl" {
+				return nil
+			}
+		} else {
+			// Ignore non-templates files
+			if filepath.Ext(path) != ".html" {
+				return nil
+			}
 		}
 
 		b, err := ioutil.ReadFile(path)
