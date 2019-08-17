@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 var (
@@ -23,7 +24,10 @@ func main() {
 	buf := new(bytes.Buffer)
 	fmt.Fprint(buf, `package templates
 
-	import "text/template"
+	import (
+		"text/template"
+		"strings"
+	)
 
   	var templates = map[string]string{`)
 
@@ -41,34 +45,34 @@ func main() {
 		if err != nil {
 			return err
 		}
-
-		fmt.Fprintf(buf, "\"%s\": `%s`,\n", filepath.Base(path), b)
+		s := strings.ReplaceAll(string(b), "`", "__TEMP_BACKTICK__")
+		fmt.Fprintf(buf, "\"%s\": `%s`,\n", filepath.Base(path), s)
 
 		return nil
 	}); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Fprint(buf, `}
+	fmt.Fprintf(buf, `}
 
-	// Parse parses declared templates.
 	func Parse(t *template.Template) (*template.Template, error) {
-  		for name, s := range templates {
-  			var tmpl *template.Template
-  			if t == nil {
-  				t = template.New(name)
-  			}
-  			if name == t.Name() {
-  				tmpl = t
-  			} else {
-  				tmpl = t.New(name)
-  			}
-	  		if _, err := tmpl.Parse(s); err != nil {
-  				return nil, err
-  			}
-  		}
-  		return t, nil
-  	}`)
+		for name, s := range templates {
+			var tmpl *template.Template
+			if t == nil {
+				t = template.New(name)
+			}
+			if name == t.Name() {
+				tmpl = t
+			} else {
+				tmpl = t.New(name)
+			}
+			ss := strings.ReplaceAll(s, "__TEMP_BACKTICK__", "%s")
+			if _, err := tmpl.Parse(ss); err != nil {
+				return nil, err
+			}
+		}
+		return t, nil
+	}`, "`")
 
 	clean, err := format.Source(buf.Bytes())
 	if err != nil {
