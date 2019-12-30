@@ -21,6 +21,10 @@ var (
 func main() {
 	flag.Parse()
 
+	if *templateType != "html" && *templateType != "text" {
+		log.Fatalf("unexpected template type given: %s", *templateType)
+	}
+
 	buf := new(bytes.Buffer)
 	fmt.Fprint(buf, fmt.Sprintf(`package templates
 
