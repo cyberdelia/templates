@@ -1,3 +1,5 @@
+⚠️ This library is now obsolete, please use: https://golang.org/pkg/embed/
+
 # Templates
 
 Templates allows you to bundle file template in your binary.
